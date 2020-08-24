@@ -17,14 +17,7 @@ Done for a PoC and exercise to use JNI and link native libraries. If needed, use
 	&& cmake --build bld/armeabi-v7a
 
 ## Linking Paho MQTT C library to Android Studio
-Add Paho MQTT library directory to local.properties file.
-### CMakeLists.txt
-	...
-	add_library( paho-mqtt-c-example SHARED test.cpp )
-	...
-	target_link_libraries( paho-mqtt-c-example ${PATH_TO_PAHO}/libpaho-mqtt3c.a log android OpenSLES )
-	...
-	
+Add Paho MQTT library directory to local.properties file. Then, take a path variable from this file:  
 ### build.gradle
 Load in the library directory value to a path variable.
 	
@@ -48,3 +41,10 @@ The rest in android { defaultConfig {
 		}
 	}
 	...
+### CMakeLists.txt
+	...
+	add_library( paho-mqtt-c-example SHARED test.cpp )
+	...
+	target_link_libraries( paho-mqtt-c-example ${PATH_TO_PAHO}/libpaho-mqtt3c.a log android OpenSLES )
+	...
+	
