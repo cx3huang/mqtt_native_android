@@ -26,19 +26,22 @@ extern "C" JNIEXPORT jint JNICALL Java_com_example_a1_MainActivity_connect(
         JNIEnv* env,
         jobject /* this */) {
     __android_log_print(ANDROID_LOG_INFO, "Connect", "Entered connect()");
-    MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
-    char url[100] = ADDRESS;
 
-    rc = MQTTClient_create(&client, url, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE,
+    //Initializes connection options for MQTT Client.
+    MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
+    // char url[100] = ADDRESS;
+    // Creates the MQTT Client.
+    rc = MQTTClient_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE,
             NULL);
     __android_log_print(ANDROID_LOG_INFO, "Connect", "MQTT client created");
 
+    // Configures the options for connection.
     conn_opts.keepAliveInterval = KEEPALIVE;
     conn_opts.reliable = 0;
     conn_opts.cleansession = 1;
     conn_opts.username = NULL;
     conn_opts.password = NULL;
-
+    // Connects the MQTT Client
     rc = 0;
     if((rc = MQTTClient_connect(client, &conn_opts)) != 0) {
         __android_log_print(ANDROID_LOG_ERROR, "Connect", "Connect failed");
@@ -53,12 +56,11 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_example_a1_MainActivity_subscribe(
         jobject /* this */) {
     __android_log_print(ANDROID_LOG_INFO, "Subscribe", "Entered subscribe()");
     char toReturn[100];
-
+    // Subscribes to the topic provided.
     if((rc = MQTTClient_subscribe(client, TOPIC, QOS)) != 0) {
         __android_log_print(ANDROID_LOG_ERROR, "Subscribe", "Subscribe failed");
         exit(EXIT_FAILURE);
     }
-
     int cont = 0;
     while(!toStop && cont < 10) {
         char* topicName = NULL;
@@ -88,6 +90,8 @@ extern "C" JNIEXPORT jobject JNICALL Java_com_example_a1_MainActivity_publish(
         JNIEnv* env,
         jobject /* this */) {
     __android_log_print(ANDROID_LOG_INFO, "Publish", "Entered publish()");
+
+    // Setting callbacks for MQTT Client
     char* buffer = NULL;
     if((rc = MQTTClient_setCallbacks(client, NULL, NULL,
                                      reinterpret_cast<int (*)(void *, char *, int,
@@ -114,6 +118,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_com_example_a1_MainActivity_publish(
         }
         while (dataLen < MAXDATALEN);
 
+        // Publish using MQTT Client
         if((rc = MQTTClient_publish(client, TOPIC, dataLen, buffer, QOS, 0,
                 NULL) != 0)) {
             __android_log_print(ANDROID_LOG_ERROR, "Publish", "Publish failed");
@@ -122,6 +127,8 @@ extern "C" JNIEXPORT jobject JNICALL Java_com_example_a1_MainActivity_publish(
         ++cont;
     }
     __android_log_print(ANDROID_LOG_INFO, "Publish", "Exiting publish()");
+
+    // Free the message buffer
     free(buffer);
 }
 
@@ -129,6 +136,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_com_example_a1_MainActivity_disconnect
         JNIEnv* env,
         jobject /* this */) {
     __android_log_print(ANDROID_LOG_INFO, "Disconnect", "Entered disconnect()");
+    // Disconnect and destroy the created client
     MQTTClient_disconnect(client, 0);
     MQTTClient_destroy(&client);
     __android_log_print(ANDROID_LOG_INFO, "Disconnect", "Exiting disconnect()");
