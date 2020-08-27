@@ -19,7 +19,7 @@
 #define MAXDATALEN 100
 
 volatile int toStop = 0;
-static MQTTClient client;
+MQTTClient client;
 int rc = 0;
 
 extern "C" JNIEXPORT jint JNICALL Java_com_example_a1_MainActivity_connect(
